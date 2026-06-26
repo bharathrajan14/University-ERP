@@ -32,17 +32,3 @@ university-erp/
 ├── .gitignore
 └── README.md
 ```
-
-## Running the Project
-
-### Client
-```bash
-cd client
-npm run dev
-```
-
-### Server
-```bash
-cd server
-npm run dev # or nodemon index.js once entry file is added
-```
