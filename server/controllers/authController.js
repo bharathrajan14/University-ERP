@@ -330,28 +330,147 @@ const loginUser = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────────────────────────
-//  GET CURRENT USER (ME)
-//  Route  : GET /api/auth/me
-//  Access : Private (requires valid JWT token)
-// ─────────────────────────────────────────────────────────────────
-const getMe = async (req, res) => {
+// ═════════════════════════════════════════════════════════════════
+//  GET PROFILE
+//  Route  : GET /api/auth/profile
+//  Access : Private — requires a valid JWT (protect middleware)
+//
+//  By the time this controller runs, protect middleware has:
+//    1. Verified the JWT
+//    2. Looked up the user in MongoDB
+//    3. Attached the full user document to req.user
+//
+//  This means getProfile needs ZERO database calls.
+//  The work was already done in middleware — we just respond.
+// ═════════════════════════════════════════════════════════════════
+const getProfile = async (req, res) => {
   try {
-    // req.user was populated by the protect middleware.
-    // It is already verified, active, and contains user fields.
+
+    // req.user is the complete, fresh Mongoose user document
+    // populated by protect. It already excludes the password
+    // because protect used .select('-password').
+    //
+    // We respond with 200 OK — the resource exists and is returned.
+    // No database query here: protect already ran User.findById().
     return res.status(200).json({
-      success: true,
-      data: req.user,
+      success : true,
+      message : 'Profile fetched successfully',
+      data    : req.user,
     });
+
   } catch (error) {
-    console.error('[getMe] Unexpected error:', error);
+    console.error('[getProfile] Unexpected error:', error);
     return res.status(500).json({
-      success: false,
-      message: 'Internal server error. Please try again later.',
+      success : false,
+      message : 'Internal server error.',
     });
   }
 };
 
-// Functions exported as named exports from one controller file.
-module.exports = { registerUser, loginUser, getMe };
 
+// ═════════════════════════════════════════════════════════════════
+//  UPDATE PROFILE
+//  Route  : PUT /api/auth/profile
+//  Access : Private — requires a valid JWT (protect middleware)
+//
+//  A user can update only their own non-sensitive fields.
+//  Sensitive changes (email, password, role) are intentionally
+//  blocked here — they belong on separate, audited endpoints.
+// ═════════════════════════════════════════════════════════════════
+const updateProfile = async (req, res) => {
+  try {
+
+    // ── STEP 1: VALIDATE INPUT ────────────────────────────────
+    // updateProfileValidator ran before this controller.
+    // Collect its results the same way every controller does.
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success : false,
+        message : 'Validation failed',
+        errors  : errors.array(),
+      });
+    }
+
+    // ── STEP 2: WHITELIST UPDATABLE FIELDS ───────────────────
+    // Destructure ONLY the two fields we allow to change.
+    // Even if the client sends { role: 'admin', isActive: false },
+    // those keys are silently dropped because we never read them.
+    //
+    // COMMON MISTAKE: doing User.findByIdAndUpdate(id, req.body).
+    // That passes the entire request body straight to MongoDB,
+    // letting a user update any field including role and isActive.
+    const { fullName, department } = req.body;
+
+    // ── STEP 3: BUILD THE UPDATE OBJECT DYNAMICALLY ──────────
+    // Only include a field in the update if the client actually
+    // sent it. Without this check, sending { "fullName": "Arun" }
+    // would also set department to undefined, clearing the
+    // existing value the user never intended to remove.
+    const updateFields = {};
+    if (fullName  !== undefined) updateFields.fullName  = fullName;
+    if (department !== undefined) updateFields.department = department;
+
+    // If the body contained nothing we can update, tell the client.
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({
+        success : false,
+        message : 'Please provide at least one field to update: fullName or department.',
+      });
+    }
+
+    // ── STEP 4: UPDATE THE DOCUMENT ──────────────────────────
+    // User.findByIdAndUpdate() arguments:
+    //
+    //   1. req.user._id    — the ID attached by protect middleware.
+    //                        Users can only update THEIR OWN profile.
+    //                        There is no id in the URL that could
+    //                        be swapped to edit someone else's data.
+    //
+    //   2. updateFields    — only the whitelisted fields.
+    //
+    //   3. { new: true }   — return the document AFTER the update.
+    //                        Without this, Mongoose returns the old
+    //                        document and the client sees stale data.
+    //
+    //   4. { runValidators: true } — re-run schema validators
+    //                        (minlength, maxlength, etc.) on the
+    //                        new values before saving. Without this,
+    //                        schema rules are bypassed on updates.
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      updateFields,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    return res.status(200).json({
+      success : true,
+      message : 'Profile updated successfully',
+      data    : updatedUser,
+    });
+
+  } catch (error) {
+
+    // Mongoose validation error — schema constraint violated during update.
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(e => e.message);
+      return res.status(400).json({
+        success : false,
+        message : 'Validation failed',
+        errors  : messages,
+      });
+    }
+
+    console.error('[updateProfile] Unexpected error:', error);
+    return res.status(500).json({
+      success : false,
+      message : 'Internal server error.',
+    });
+  }
+};
+
+// Also export getMe as alias to getProfile for backwards compatibility
+const getMe = getProfile;
+
+// Export all controller functions
+module.exports = { registerUser, loginUser, getProfile, updateProfile, getMe };

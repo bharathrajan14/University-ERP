@@ -118,4 +118,44 @@ const loginValidator = [
 
 ];
 
-module.exports = { registerValidator, loginValidator };
+
+// ─────────────────────────────────────────────────────────────────
+//  UPDATE PROFILE VALIDATOR
+//
+//  Every field is optional because a user may update only their
+//  fullName, only their department, or both at once.
+//  .optional() means: if the field is absent from the request
+//  body, skip this rule entirely. If it IS present, enforce it.
+//
+//  FIELDS INTENTIONALLY EXCLUDED FROM THIS VALIDATOR:
+//    email    → changing email requires a separate verify-email flow
+//    password → changing password needs its own endpoint with
+//               "current password" confirmation
+//    role     → only an admin can change roles (different route)
+//    isActive → only an admin can activate/deactivate accounts
+//
+//  By not accepting those fields here we protect against a user
+//  sending { "role": "admin" } and silently elevating themselves.
+//  The controller will destructure only fullName and department.
+// ─────────────────────────────────────────────────────────────────
+const updateProfileValidator = [
+
+  // fullName rules match the User model schema constraints exactly.
+  // If they diverge, the validator passes but Mongoose rejects it —
+  // keeping them in sync produces a clean error at the right layer.
+  body('fullName')
+    .optional()
+    .trim()
+    .isLength({ min: 3, max: 100 })
+    .withMessage('Full name must be between 3 and 100 characters'),
+
+  // department is free-form text, just capped for DB safety.
+  body('department')
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage('Department name cannot exceed 100 characters'),
+
+];
+
+module.exports = { registerValidator, loginValidator, updateProfileValidator };
