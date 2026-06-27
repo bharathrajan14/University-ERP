@@ -6,6 +6,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import NotFound from '../pages/NotFound';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 /**
  * Centralized Route configuration component for managing application routing.
@@ -20,7 +21,11 @@ const AppRoutes = () => {
         <Route path="register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
       </Route>
-      <Route path="/dashboard" element={<Dashboard />} />
+
+      {/* Protected Routes */}
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Route>
     </Routes>
   );
 };
