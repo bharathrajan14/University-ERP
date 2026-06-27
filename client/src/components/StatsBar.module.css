@@ -1,0 +1,65 @@
+/* ─────────────────────────────────────────────────────────────────
+   STATSBAR — CSS MODULE
+   ───────────────────────────────────────────────────────────────── */
+
+.statsBar {
+  background: var(--midnight);
+}
+
+.inner {
+  max-width: 1200px;
+  margin   : 0 auto;
+  padding  : 0 24px;
+  display  : grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.statItem {
+  display       : flex;
+  flex-direction: column;
+  align-items   : center;
+  padding       : 44px 24px;
+  border-right  : 1px solid rgba(255, 255, 255, 0.07);
+  gap           : 6px;
+  text-align    : center;
+}
+
+.statItem:last-child {
+  border-right: none;
+}
+
+.value {
+  font-family  : var(--font-display);
+  font-size    : 38px;
+  font-weight  : 700;
+  color        : var(--gold);
+  letter-spacing: -1px;
+  line-height  : 1;
+}
+
+.label {
+  font-family  : var(--font-body);
+  font-size    : 12px;
+  font-weight  : 500;
+  color        : rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .inner {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statItem:nth-child(1),
+  .statItem:nth-child(2) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .statItem:nth-child(2),
+  .statItem:nth-child(4) {
+    border-right: none;
+  }
+
+  .value { font-size: 32px; }
+}

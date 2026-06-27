@@ -1,0 +1,139 @@
+/* ─────────────────────────────────────────────────────────────────
+   NAVBAR — CSS MODULE
+   ───────────────────────────────────────────────────────────────── */
+
+.navbar {
+  position   : sticky;
+  top        : 0;
+  z-index    : 100;
+  background : var(--white);
+  border-bottom : 1px solid var(--border);
+  box-shadow : 0 1px 12px rgba(13, 27, 62, 0.06);
+}
+
+.inner {
+  max-width  : 1200px;
+  margin     : 0 auto;
+  padding    : 0 24px;
+  height     : 68px;
+  display    : flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+  text-decoration: none;
+}
+
+.brandIcon {
+  font-size  : 22px;
+  line-height: 1;
+}
+
+.brandText {
+  font-family : var(--font-display);
+  font-size   : 20px;
+  font-weight : 700;
+  color       : var(--midnight);
+  letter-spacing: -0.3px;
+}
+
+.brandAccent {
+  color: var(--gold);
+}
+
+.navActions {
+  display    : flex;
+  align-items: center;
+  gap        : 8px;
+}
+
+.btnLogin {
+  padding    : 9px 22px;
+  border-radius: 7px;
+  font-family : var(--font-body);
+  font-size  : 14px;
+  font-weight: 500;
+  color      : var(--midnight);
+  transition : background 0.18s ease;
+}
+
+.btnLogin:hover {
+  background : var(--ivory);
+}
+
+.btnRegister {
+  padding    : 9px 22px;
+  border-radius: 7px;
+  font-family : var(--font-body);
+  font-size  : 14px;
+  font-weight: 600;
+  color      : var(--white);
+  background : var(--midnight);
+  transition : background 0.18s ease, transform 0.12s ease;
+}
+
+.btnRegister:hover {
+  background : var(--gold);
+  transform  : translateY(-1px);
+}
+
+.hamburger {
+  display        : none;
+  flex-direction : column;
+  justify-content: center;
+  gap            : 5px;
+  background     : none;
+  border         : none;
+  cursor         : pointer;
+  padding        : 8px;
+  border-radius  : 6px;
+  transition     : background 0.15s;
+}
+
+.hamburger:hover {
+  background: var(--ivory);
+}
+
+.hamburger span {
+  display      : block;
+  width        : 22px;
+  height       : 2px;
+  background   : var(--midnight);
+  border-radius: 2px;
+  transition   : all 0.2s ease;
+}
+
+@media (max-width: 640px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .navActions {
+    display        : none;
+    position       : absolute;
+    top            : 68px;
+    left           : 0;
+    right          : 0;
+    flex-direction : column;
+    background     : var(--white);
+    padding        : 12px 24px 20px;
+    border-bottom  : 1px solid var(--border);
+    box-shadow     : 0 8px 20px rgba(13, 27, 62, 0.08);
+    gap            : 8px;
+    z-index        : 99;
+  }
+
+  .navActions.open {
+    display: flex;
+  }
+
+  .btnLogin,
+  .btnRegister {
+    text-align: center;
+    padding   : 12px 22px;
+  }
+}
