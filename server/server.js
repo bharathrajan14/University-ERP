@@ -6,6 +6,9 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db');
 
+// Import routes
+const authRoutes = require('./routes/authRoutes');
+
 // Initialize Express application
 const app = express();
 
@@ -18,6 +21,9 @@ app.use(cors());
 
 // Enable built-in JSON parsing middleware to parse incoming JSON payloads in request bodies
 app.use(express.json());
+
+// Mount routes
+app.use('/api/auth', authRoutes);
 
 // Define a test route to verify the server is running and reachable
 app.get('/api/test', (req, res) => {

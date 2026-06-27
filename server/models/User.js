@@ -118,13 +118,13 @@ const UserSchema = new mongoose.Schema(
 //  update). Putting it here means it happens exactly once,
 //  automatically, no matter which part of the app saves the user.
 // ═════════════════════════════════════════════════════════════════
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {
   // `this` refers to the current User document being saved.
   // `isModified('password')` returns true only when the password
   // field has actually changed. This prevents re-hashing an
   // already-hashed password when you update, say, the user's
   // department or role.
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) return;
 
   // bcrypt.genSalt(12) generates a cryptographic "salt" —
   // a random string mixed into the password before hashing.
@@ -133,8 +133,6 @@ UserSchema.pre('save', async function (next) {
   // 12 is the industry-recommended balance of security vs speed.
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
-
-  next(); // hand control back to Mongoose to complete the save
 });
 
 
