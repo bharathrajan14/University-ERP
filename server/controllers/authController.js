@@ -330,6 +330,28 @@ const loginUser = async (req, res) => {
   }
 };
 
-// Both functions exported as named exports from one controller file.
-// The route file imports only what it needs.
-module.exports = { registerUser, loginUser };
+// ─────────────────────────────────────────────────────────────────
+//  GET CURRENT USER (ME)
+//  Route  : GET /api/auth/me
+//  Access : Private (requires valid JWT token)
+// ─────────────────────────────────────────────────────────────────
+const getMe = async (req, res) => {
+  try {
+    // req.user was populated by the protect middleware.
+    // It is already verified, active, and contains user fields.
+    return res.status(200).json({
+      success: true,
+      data: req.user,
+    });
+  } catch (error) {
+    console.error('[getMe] Unexpected error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error. Please try again later.',
+    });
+  }
+};
+
+// Functions exported as named exports from one controller file.
+module.exports = { registerUser, loginUser, getMe };
+

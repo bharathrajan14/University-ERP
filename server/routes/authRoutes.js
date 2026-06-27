@@ -5,10 +5,13 @@ const express = require('express');
 const router  = express.Router();
 
 // Import both controller functions from the single auth controller.
-const { registerUser, loginUser } = require('../controllers/authController');
+const { registerUser, loginUser, getMe } = require('../controllers/authController');
 
 // Import both validator arrays from the single auth validator.
 const { registerValidator, loginValidator } = require('../validators/authValidator');
+
+// Import authentication middleware
+const { protect } = require('../middleware/authMiddleware');
 
 // ─────────────────────────────────────────────────────────────────
 //  POST /api/auth/register
@@ -27,4 +30,11 @@ router.post('/register', registerValidator, registerUser);
 // ─────────────────────────────────────────────────────────────────
 router.post('/login', loginValidator, loginUser);
 
+// ─────────────────────────────────────────────────────────────────
+//  GET /api/auth/me
+//  Private — retrieves details of currently logged-in user
+// ─────────────────────────────────────────────────────────────────
+router.get('/me', protect, getMe);
+
 module.exports = router;
+
