@@ -67,7 +67,7 @@ const Auth = ({ initialTab = 'login' }) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.data));
         showToast(setLoginToast, 'Login successful!', 'success');
-        setTimeout(() => navigate('/'), 1000);
+        setTimeout(() => navigate('/dashboard'), 1000);
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Please check your credentials.';
