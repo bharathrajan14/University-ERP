@@ -1,50 +1,89 @@
 /* ─────────────────────────────────────────────────────────────────
-   NAVBAR — CSS MODULE
+   NAVBAR — CSS MODULE (Glassmorphism Upgrade)
    ───────────────────────────────────────────────────────────────── */
 
 .navbar {
-  position   : sticky;
-  top        : 0;
-  z-index    : 100;
-  background : var(--white);
-  border-bottom : 1px solid var(--border);
-  box-shadow : 0 1px 12px rgba(13, 27, 62, 0.06);
+  position          : sticky;
+  top               : 0;
+  z-index           : 100;
+  background        : rgba(255, 255, 255, 0.82);
+  backdrop-filter   : blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom     : 1px solid rgba(226, 221, 213, 0.6);
+  box-shadow        : 0 1px 0 rgba(196, 149, 42, 0.08),
+                      0 4px 24px rgba(13, 27, 62, 0.06);
+  transition        : background 0.3s var(--ease-smooth),
+                      box-shadow 0.3s var(--ease-smooth);
+}
+
+.navbar.scrolled {
+  background : rgba(255, 255, 255, 0.95);
+  box-shadow : 0 1px 0 rgba(196, 149, 42, 0.12),
+               0 8px 32px rgba(13, 27, 62, 0.10);
 }
 
 .inner {
-  max-width  : 1200px;
-  margin     : 0 auto;
-  padding    : 0 24px;
-  height     : 68px;
-  display    : flex;
-  align-items: center;
+  max-width      : 1200px;
+  margin         : 0 auto;
+  padding        : 0 24px;
+  height         : 68px;
+  display        : flex;
+  align-items    : center;
   justify-content: space-between;
 }
 
+/* ── Brand ── */
 .brand {
-  display    : flex;
-  align-items: center;
-  gap        : 8px;
+  display        : flex;
+  align-items    : center;
+  gap            : 10px;
   text-decoration: none;
+  transition     : transform 0.2s var(--ease-bounce);
+}
+
+.brand:hover {
+  transform: translateY(-1px);
 }
 
 .brandIcon {
-  font-size  : 22px;
-  line-height: 1;
+  width           : 38px;
+  height          : 38px;
+  border-radius   : 10px;
+  background      : var(--gradient-brand);
+  display         : flex;
+  align-items     : center;
+  justify-content : center;
+  font-size       : 18px;
+  box-shadow      : 0 4px 12px rgba(13, 27, 62, 0.25),
+                    inset 0 1px 0 rgba(255,255,255,0.1);
+  transition      : box-shadow 0.2s var(--ease-smooth),
+                    transform 0.2s var(--ease-bounce);
+}
+
+.brand:hover .brandIcon {
+  box-shadow: 0 6px 20px rgba(13, 27, 62, 0.3),
+              0 0 0 3px rgba(196, 149, 42, 0.25);
+  transform : rotate(-5deg) scale(1.05);
 }
 
 .brandText {
-  font-family : var(--font-display);
-  font-size   : 20px;
-  font-weight : 700;
-  color       : var(--midnight);
+  font-family   : var(--font-display);
+  font-size     : 20px;
+  font-weight   : 700;
+  color         : var(--midnight);
   letter-spacing: -0.3px;
 }
 
 .brandAccent {
-  color: var(--gold);
+  background             : var(--gradient-gold);
+  background-size        : 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip        : text;
+  animation              : shimmer 3s linear infinite;
 }
 
+/* ── Nav Actions ── */
 .navActions {
   display    : flex;
   align-items: center;
@@ -52,35 +91,54 @@
 }
 
 .btnLogin {
-  padding    : 9px 22px;
-  border-radius: 7px;
-  font-family : var(--font-body);
-  font-size  : 14px;
-  font-weight: 500;
-  color      : var(--midnight);
-  transition : background 0.18s ease;
+  padding       : 9px 22px;
+  border-radius : var(--radius-sm);
+  font-family   : var(--font-body);
+  font-size     : 14px;
+  font-weight   : 500;
+  color         : var(--midnight);
+  transition    : background 0.18s ease, color 0.18s ease;
 }
 
 .btnLogin:hover {
-  background : var(--ivory);
+  background: var(--ivory);
+  color     : var(--midnight);
 }
 
 .btnRegister {
-  padding    : 9px 22px;
-  border-radius: 7px;
-  font-family : var(--font-body);
-  font-size  : 14px;
-  font-weight: 600;
-  color      : var(--white);
-  background : var(--midnight);
-  transition : background 0.18s ease, transform 0.12s ease;
+  padding       : 9px 22px;
+  border-radius : var(--radius-sm);
+  font-family   : var(--font-body);
+  font-size     : 14px;
+  font-weight   : 600;
+  color         : var(--white);
+  background    : var(--gradient-brand);
+  box-shadow    : var(--shadow-sm);
+  transition    : transform 0.2s var(--ease-bounce),
+                  box-shadow 0.2s ease;
+  position      : relative;
+  overflow      : hidden;
+}
+
+.btnRegister::before {
+  content    : '';
+  position   : absolute;
+  inset      : 0;
+  background : linear-gradient(135deg, rgba(196,149,42,0) 0%, rgba(196,149,42,0.25) 100%);
+  opacity    : 0;
+  transition : opacity 0.2s ease;
 }
 
 .btnRegister:hover {
-  background : var(--gold);
-  transform  : translateY(-1px);
+  transform : translateY(-2px);
+  box-shadow: var(--shadow-gold);
 }
 
+.btnRegister:hover::before {
+  opacity: 1;
+}
+
+/* ── Hamburger ── */
 .hamburger {
   display        : none;
   flex-direction : column;
@@ -90,7 +148,7 @@
   border         : none;
   cursor         : pointer;
   padding        : 8px;
-  border-radius  : 6px;
+  border-radius  : var(--radius-sm);
   transition     : background 0.15s;
 }
 
@@ -104,7 +162,20 @@
   height       : 2px;
   background   : var(--midnight);
   border-radius: 2px;
-  transition   : all 0.2s ease;
+  transition   : all 0.28s var(--ease-smooth);
+  transform-origin: center;
+}
+
+/* Hamburger → X animation */
+.hamburger.open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.hamburger.open span:nth-child(2) {
+  opacity  : 0;
+  transform: scaleX(0);
+}
+.hamburger.open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 @media (max-width: 640px) {
@@ -113,18 +184,20 @@
   }
 
   .navActions {
-    display        : none;
-    position       : absolute;
-    top            : 68px;
-    left           : 0;
-    right          : 0;
-    flex-direction : column;
-    background     : var(--white);
-    padding        : 12px 24px 20px;
-    border-bottom  : 1px solid var(--border);
-    box-shadow     : 0 8px 20px rgba(13, 27, 62, 0.08);
-    gap            : 8px;
-    z-index        : 99;
+    display       : none;
+    position      : absolute;
+    top           : 68px;
+    left          : 0;
+    right         : 0;
+    flex-direction: column;
+    background    : rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(20px);
+    padding       : 12px 24px 20px;
+    border-bottom : 1px solid var(--border);
+    box-shadow    : 0 12px 32px rgba(13, 27, 62, 0.12);
+    gap           : 8px;
+    z-index       : 99;
+    animation     : slideDown 0.2s var(--ease-out);
   }
 
   .navActions.open {

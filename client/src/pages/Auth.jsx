@@ -1,7 +1,14 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { loginApi, registerApi } from '../services/authService';
 import styles from './Auth.module.css';
+
+const DEPARTMENTS = [
+  'Computer Science', 'Engineering', 'Mathematics', 'Physics',
+  'Biology', 'Economics', 'Law', 'Medicine', 'Business', 'Administration',
+];
+
+const ROLES = ['Student', 'Faculty', 'Admin', 'Staff'];
 
 const Auth = ({ initialTab = 'login' }) => {
   const navigate = useNavigate();
@@ -42,7 +49,7 @@ const Auth = ({ initialTab = 'login' }) => {
     if (/[A-Z]/.test(regPw) && /[0-9]/.test(regPw)) s++;
     if (/[^A-Za-z0-9]/.test(regPw)) s++;
     const labs = ['', 'Weak', 'Fair', 'Strong'];
-    const cols = ['', '#c0392b', '#C4952A', '#27ae60'];
+    const cols = ['', '#ef4444', '#C4952A', '#22c55e'];
     return { score: s, label: labs[s], color: cols[s] };
   };
 
@@ -63,7 +70,6 @@ const Auth = ({ initialTab = 'login' }) => {
       });
 
       if (res.success && res.token) {
-        // Store JWT token in localStorage
         localStorage.setItem('token', res.token);
         localStorage.setItem('user', JSON.stringify(res.data));
         showToast(setLoginToast, 'Login successful!', 'success');
@@ -114,278 +120,326 @@ const Auth = ({ initialTab = 'login' }) => {
 
   const pwStrength = getPasswordStrength();
 
+  const features = [
+    { icon: '🎓', text: 'Student portal & grade tracking' },
+    { icon: '📅', text: 'Course scheduling & enrollment'  },
+    { icon: '👨‍🏫', text: 'Faculty management system'      },
+    { icon: '🔒', text: 'Secure JWT-protected sessions'   },
+  ];
+
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.wrapper}>
-        <div className={styles.tabs}>
-          <button
-            type="button"
-            className={`${styles.tabBtn} ${activeTab === 'login' ? styles.active : ''}`}
-            onClick={() => setActiveTab('login')}
-          >
-            Sign in
-          </button>
-          <button
-            type="button"
-            className={`${styles.tabBtn} ${activeTab === 'register' ? styles.active : ''}`}
-            onClick={() => setActiveTab('register')}
-          >
-            Register
-          </button>
+    <div className={styles.authPage}>
+      {/* ── Left branding panel ── */}
+      <aside className={styles.brandPanel} aria-hidden="true">
+        <div className={styles.brandPanelInner}>
+          <Link to="/" className={styles.brandLogo}>
+            <span className={styles.brandLogoIcon}>🏛</span>
+            <span className={styles.brandLogoText}>
+              <span className={styles.brandAccent}>Uni</span>ERP
+            </span>
+          </Link>
+
+          <div className={styles.brandHeadline}>
+            <h2>Your University.<br /><em>Streamlined.</em></h2>
+            <p>
+              One secure platform for every academic operation —
+              from enrollments to faculty records.
+            </p>
+          </div>
+
+          <ul className={styles.featureList}>
+            {features.map(({ icon, text }) => (
+              <li key={text} className={styles.featureItem}>
+                <span className={styles.featureIcon}>{icon}</span>
+                <span>{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className={styles.brandFooter}>
+            <span className={styles.liveDot} />
+            System live · 24/7 access
+          </div>
         </div>
 
-        {/* LOGIN PANEL */}
-        {activeTab === 'login' && (
-          <form className={styles.formPanel} onSubmit={handleLogin} noValidate>
-            <h2 className={styles.panelHeading}>
-              Welcome <span className={styles.gold}>back</span>
-            </h2>
-            <p className={styles.panelSub}>Sign in to your university account</p>
+        {/* Decorative rings */}
+        <div className={styles.deco1} />
+        <div className={styles.deco2} />
+        <div className={styles.deco3} />
+      </aside>
 
-            {loginToast && (
-              <div
-                className={`${styles.toast} ${
-                  loginToast.type === 'success'
-                    ? styles.toastSuccess
-                    : loginToast.type === 'info'
-                    ? styles.toastInfo
-                    : ''
-                }`}
-              >
-                {loginToast.msg}
-              </div>
-            )}
-
-            <div className={styles.field}>
-              <label>Email address</label>
-              <input
-                type="email"
-                placeholder="you@university.edu"
-                value={loginEmail}
-                onChange={(e) => {
-                  setLoginEmail(e.target.value);
-                  if (loginErrors.email) setLoginErrors((prev) => ({ ...prev, email: null }));
-                }}
-                className={loginErrors.email ? styles.error : ''}
-              />
-              {loginErrors.email && <span className={styles.fieldError}>{loginErrors.email}</span>}
-            </div>
-
-            <div className={styles.field}>
-              <label>Password</label>
-              <div className={styles.pwWrap}>
-                <input
-                  type={showLoginPw ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  value={loginPass}
-                  onChange={(e) => {
-                    setLoginPass(e.target.value);
-                    if (loginErrors.pass) setLoginErrors((prev) => ({ ...prev, pass: null }));
-                  }}
-                  className={loginErrors.pass ? styles.error : ''}
-                />
-                <button
-                  type="button"
-                  className={styles.togglePw}
-                  onClick={() => setShowLoginPw((prev) => !prev)}
-                  aria-label="Toggle password"
-                >
-                  <i className={`ti ${showLoginPw ? 'ti-eye-off' : 'ti-eye'}`} aria-hidden="true"></i>
-                </button>
-              </div>
-              {loginErrors.pass && <span className={styles.fieldError}>{loginErrors.pass}</span>}
-            </div>
-
+      {/* ── Right form panel ── */}
+      <main className={styles.formSide}>
+        <div className={styles.wrapper}>
+          {/* Tabs */}
+          <div className={styles.tabs} role="tablist">
             <button
               type="button"
-              className={styles.forgot}
-              onClick={() => showToast(setLoginToast, 'Reset link will be sent to your email.', 'info')}
+              role="tab"
+              aria-selected={activeTab === 'login'}
+              className={`${styles.tabBtn} ${activeTab === 'login' ? styles.active : ''}`}
+              onClick={() => setActiveTab('login')}
             >
-              Forgot password?
+              Sign in
             </button>
-
-            <button type="submit" className={styles.btn} disabled={loginLoading}>
-              {loginLoading && <span className={styles.spinner}></span>}
-              <span>Sign in</span>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'register'}
+              className={`${styles.tabBtn} ${activeTab === 'register' ? styles.active : ''}`}
+              onClick={() => setActiveTab('register')}
+            >
+              Register
             </button>
+          </div>
 
-            <p className={styles.formFooter}>
-              Don't have an account?{' '}
-              <button type="button" onClick={() => setActiveTab('register')}>
-                Register here
-              </button>
-            </p>
-          </form>
-        )}
+          {/* LOGIN PANEL */}
+          {activeTab === 'login' && (
+            <form className={styles.formPanel} onSubmit={handleLogin} noValidate>
+              <h1 className={styles.panelHeading}>
+                Welcome <span className={styles.gold}>back</span>
+              </h1>
+              <p className={styles.panelSub}>Sign in to your university account</p>
 
-        {/* REGISTER PANEL */}
-        {activeTab === 'register' && (
-          <form className={styles.formPanel} onSubmit={handleRegister} noValidate>
-            <h2 className={styles.panelHeading}>
-              Join the <span className={styles.gold}>university</span>
-            </h2>
-            <p className={styles.panelSub}>Create your ERP account to get started</p>
-
-            {regToast && (
-              <div
-                className={`${styles.toast} ${
-                  regToast.type === 'success'
-                    ? styles.toastSuccess
-                    : regToast.type === 'info'
-                    ? styles.toastInfo
-                    : ''
-                }`}
-              >
-                {regToast.msg}
-              </div>
-            )}
-
-            <div className={styles.row2}>
-              <div className={styles.field}>
-                <label>First name</label>
-                <input
-                  type="text"
-                  placeholder="Ada"
-                  value={regFn}
-                  onChange={(e) => {
-                    setRegFn(e.target.value);
-                    if (regErrors.fn) setRegErrors((prev) => ({ ...prev, fn: null }));
-                  }}
-                  className={regErrors.fn ? styles.error : ''}
-                />
-                {regErrors.fn && <span className={styles.fieldError}>{regErrors.fn}</span>}
-              </div>
-
-              <div className={styles.field}>
-                <label>Last name</label>
-                <input
-                  type="text"
-                  placeholder="Lovelace"
-                  value={regLn}
-                  onChange={(e) => {
-                    setRegLn(e.target.value);
-                    if (regErrors.ln) setRegErrors((prev) => ({ ...prev, ln: null }));
-                  }}
-                  className={regErrors.ln ? styles.error : ''}
-                />
-                {regErrors.ln && <span className={styles.fieldError}>{regErrors.ln}</span>}
-              </div>
-            </div>
-
-            <div className={styles.field}>
-              <label>University email</label>
-              <input
-                type="email"
-                placeholder="a.lovelace@university.edu"
-                value={regEm}
-                onChange={(e) => {
-                  setRegEm(e.target.value);
-                  if (regErrors.em) setRegErrors((prev) => ({ ...prev, em: null }));
-                }}
-                className={regErrors.em ? styles.error : ''}
-              />
-              {regErrors.em && <span className={styles.fieldError}>{regErrors.em}</span>}
-            </div>
-
-            <div className={styles.row2}>
-              <div className={styles.field}>
-                <label>Department</label>
-                <div className={styles.selectWrap}>
-                  <select
-                    value={regDept}
-                    onChange={(e) => {
-                      setRegDept(e.target.value);
-                      if (regErrors.dept) setRegErrors((prev) => ({ ...prev, dept: null }));
-                    }}
-                    className={regErrors.dept ? styles.error : ''}
-                  >
-                    <option value="">Select…</option>
-                    <option>Computer Science</option>
-                    <option>Engineering</option>
-                    <option>Mathematics</option>
-                    <option>Physics</option>
-                    <option>Biology</option>
-                    <option>Economics</option>
-                    <option>Law</option>
-                    <option>Medicine</option>
-                    <option>Business</option>
-                    <option>Administration</option>
-                  </select>
-                </div>
-                {regErrors.dept && <span className={styles.fieldError}>{regErrors.dept}</span>}
-              </div>
-
-              <div className={styles.field}>
-                <label>Role</label>
-                <div className={styles.selectWrap}>
-                  <select
-                    value={regRole}
-                    onChange={(e) => {
-                      setRegRole(e.target.value);
-                      if (regErrors.role) setRegErrors((prev) => ({ ...prev, role: null }));
-                    }}
-                    className={regErrors.role ? styles.error : ''}
-                  >
-                    <option value="">Select…</option>
-                    <option>Student</option>
-                    <option>Faculty</option>
-                    <option>Admin</option>
-                    <option>Staff</option>
-                  </select>
-                </div>
-                {regErrors.role && <span className={styles.fieldError}>{regErrors.role}</span>}
-              </div>
-            </div>
-
-            <div className={`${styles.field} ${regPw ? styles[`pwS${pwStrength.score}`] : ''}`}>
-              <label>Password</label>
-              <div className={styles.pwWrap}>
-                <input
-                  type={showRegPw ? 'text' : 'password'}
-                  placeholder="Min. 8 characters"
-                  value={regPw}
-                  onChange={(e) => {
-                    setRegPw(e.target.value);
-                    if (regErrors.pw) setRegErrors((prev) => ({ ...prev, pw: null }));
-                  }}
-                  className={regErrors.pw ? styles.error : ''}
-                />
-                <button
-                  type="button"
-                  className={styles.togglePw}
-                  onClick={() => setShowRegPw((prev) => !prev)}
-                  aria-label="Toggle password"
+              {loginToast && (
+                <div
+                  className={`${styles.toast} ${
+                    loginToast.type === 'success'
+                      ? styles.toastSuccess
+                      : loginToast.type === 'info'
+                      ? styles.toastInfo
+                      : ''
+                  }`}
                 >
-                  <i className={`ti ${showRegPw ? 'ti-eye-off' : 'ti-eye'}`} aria-hidden="true"></i>
-                </button>
-              </div>
-              {regErrors.pw && <span className={styles.fieldError}>{regErrors.pw}</span>}
-              <div className={styles.strengthBar}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              {regPw && (
-                <div className={styles.strengthLabel} style={{ color: pwStrength.color }}>
-                  {pwStrength.label}
+                  {loginToast.msg}
                 </div>
               )}
-            </div>
 
-            <button type="submit" className={styles.btn} disabled={regLoading}>
-              {regLoading && <span className={styles.spinner}></span>}
-              <span>Create account</span>
-            </button>
+              <div className={styles.field}>
+                <label htmlFor="login-email">Email address</label>
+                <input
+                  id="login-email"
+                  type="email"
+                  placeholder="you@university.edu"
+                  value={loginEmail}
+                  onChange={(e) => {
+                    setLoginEmail(e.target.value);
+                    if (loginErrors.email) setLoginErrors((prev) => ({ ...prev, email: null }));
+                  }}
+                  className={loginErrors.email ? styles.error : ''}
+                />
+                {loginErrors.email && <span className={styles.fieldError}>{loginErrors.email}</span>}
+              </div>
 
-            <p className={styles.formFooter}>
-              Already have an account?{' '}
-              <button type="button" onClick={() => setActiveTab('login')}>
-                Sign in
+              <div className={styles.field}>
+                <label htmlFor="login-pass">Password</label>
+                <div className={styles.pwWrap}>
+                  <input
+                    id="login-pass"
+                    type={showLoginPw ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={loginPass}
+                    onChange={(e) => {
+                      setLoginPass(e.target.value);
+                      if (loginErrors.pass) setLoginErrors((prev) => ({ ...prev, pass: null }));
+                    }}
+                    className={loginErrors.pass ? styles.error : ''}
+                  />
+                  <button
+                    type="button"
+                    className={styles.togglePw}
+                    onClick={() => setShowLoginPw((prev) => !prev)}
+                    aria-label="Toggle password visibility"
+                  >
+                    <i className={`ti ${showLoginPw ? 'ti-eye-off' : 'ti-eye'}`} aria-hidden="true"></i>
+                  </button>
+                </div>
+                {loginErrors.pass && <span className={styles.fieldError}>{loginErrors.pass}</span>}
+              </div>
+
+              <button
+                type="button"
+                className={styles.forgot}
+                onClick={() => showToast(setLoginToast, 'Reset link will be sent to your email.', 'info')}
+              >
+                Forgot password?
               </button>
-            </p>
-          </form>
-        )}
-      </div>
+
+              <button type="submit" className={styles.btn} disabled={loginLoading}>
+                {loginLoading && <span className={styles.spinner} />}
+                <span>Sign in</span>
+              </button>
+
+              <p className={styles.formFooter}>
+                Don't have an account?{' '}
+                <button type="button" onClick={() => setActiveTab('register')}>
+                  Register here
+                </button>
+              </p>
+            </form>
+          )}
+
+          {/* REGISTER PANEL */}
+          {activeTab === 'register' && (
+            <form className={styles.formPanel} onSubmit={handleRegister} noValidate>
+              <h1 className={styles.panelHeading}>
+                Join the <span className={styles.gold}>university</span>
+              </h1>
+              <p className={styles.panelSub}>Create your ERP account to get started</p>
+
+              {regToast && (
+                <div
+                  className={`${styles.toast} ${
+                    regToast.type === 'success'
+                      ? styles.toastSuccess
+                      : regToast.type === 'info'
+                      ? styles.toastInfo
+                      : ''
+                  }`}
+                >
+                  {regToast.msg}
+                </div>
+              )}
+
+              <div className={styles.row2}>
+                <div className={styles.field}>
+                  <label htmlFor="reg-fn">First name</label>
+                  <input
+                    id="reg-fn"
+                    type="text"
+                    placeholder="Ada"
+                    value={regFn}
+                    onChange={(e) => {
+                      setRegFn(e.target.value);
+                      if (regErrors.fn) setRegErrors((prev) => ({ ...prev, fn: null }));
+                    }}
+                    className={regErrors.fn ? styles.error : ''}
+                  />
+                  {regErrors.fn && <span className={styles.fieldError}>{regErrors.fn}</span>}
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="reg-ln">Last name</label>
+                  <input
+                    id="reg-ln"
+                    type="text"
+                    placeholder="Lovelace"
+                    value={regLn}
+                    onChange={(e) => {
+                      setRegLn(e.target.value);
+                      if (regErrors.ln) setRegErrors((prev) => ({ ...prev, ln: null }));
+                    }}
+                    className={regErrors.ln ? styles.error : ''}
+                  />
+                  {regErrors.ln && <span className={styles.fieldError}>{regErrors.ln}</span>}
+                </div>
+              </div>
+
+              <div className={styles.field}>
+                <label htmlFor="reg-em">University email</label>
+                <input
+                  id="reg-em"
+                  type="email"
+                  placeholder="a.lovelace@university.edu"
+                  value={regEm}
+                  onChange={(e) => {
+                    setRegEm(e.target.value);
+                    if (regErrors.em) setRegErrors((prev) => ({ ...prev, em: null }));
+                  }}
+                  className={regErrors.em ? styles.error : ''}
+                />
+                {regErrors.em && <span className={styles.fieldError}>{regErrors.em}</span>}
+              </div>
+
+              <div className={styles.row2}>
+                <div className={styles.field}>
+                  <label htmlFor="reg-dept">Department</label>
+                  <div className={styles.selectWrap}>
+                    <select
+                      id="reg-dept"
+                      value={regDept}
+                      onChange={(e) => {
+                        setRegDept(e.target.value);
+                        if (regErrors.dept) setRegErrors((prev) => ({ ...prev, dept: null }));
+                      }}
+                      className={regErrors.dept ? styles.error : ''}
+                    >
+                      <option value="">Select…</option>
+                      {DEPARTMENTS.map(d => <option key={d}>{d}</option>)}
+                    </select>
+                  </div>
+                  {regErrors.dept && <span className={styles.fieldError}>{regErrors.dept}</span>}
+                </div>
+
+                <div className={styles.field}>
+                  <label htmlFor="reg-role">Role</label>
+                  <div className={styles.selectWrap}>
+                    <select
+                      id="reg-role"
+                      value={regRole}
+                      onChange={(e) => {
+                        setRegRole(e.target.value);
+                        if (regErrors.role) setRegErrors((prev) => ({ ...prev, role: null }));
+                      }}
+                      className={regErrors.role ? styles.error : ''}
+                    >
+                      <option value="">Select…</option>
+                      {ROLES.map(r => <option key={r}>{r}</option>)}
+                    </select>
+                  </div>
+                  {regErrors.role && <span className={styles.fieldError}>{regErrors.role}</span>}
+                </div>
+              </div>
+
+              <div className={`${styles.field} ${regPw ? styles[`pwS${pwStrength.score}`] : ''}`}>
+                <label htmlFor="reg-pw">Password</label>
+                <div className={styles.pwWrap}>
+                  <input
+                    id="reg-pw"
+                    type={showRegPw ? 'text' : 'password'}
+                    placeholder="Min. 8 characters"
+                    value={regPw}
+                    onChange={(e) => {
+                      setRegPw(e.target.value);
+                      if (regErrors.pw) setRegErrors((prev) => ({ ...prev, pw: null }));
+                    }}
+                    className={regErrors.pw ? styles.error : ''}
+                  />
+                  <button
+                    type="button"
+                    className={styles.togglePw}
+                    onClick={() => setShowRegPw((prev) => !prev)}
+                    aria-label="Toggle password visibility"
+                  >
+                    <i className={`ti ${showRegPw ? 'ti-eye-off' : 'ti-eye'}`} aria-hidden="true"></i>
+                  </button>
+                </div>
+                {regErrors.pw && <span className={styles.fieldError}>{regErrors.pw}</span>}
+                <div className={styles.strengthBar}>
+                  <span /><span /><span />
+                </div>
+                {regPw && (
+                  <div className={styles.strengthLabel} style={{ color: pwStrength.color }}>
+                    {pwStrength.label}
+                  </div>
+                )}
+              </div>
+
+              <button type="submit" className={styles.btn} disabled={regLoading}>
+                {regLoading && <span className={styles.spinner} />}
+                <span>Create account</span>
+              </button>
+
+              <p className={styles.formFooter}>
+                Already have an account?{' '}
+                <button type="button" onClick={() => setActiveTab('login')}>
+                  Sign in
+                </button>
+              </p>
+            </form>
+          )}
+        </div>
+      </main>
     </div>
   );
 };

@@ -119,6 +119,7 @@ const Dashboard = () => {
 
         {/* WELCOME */}
         <div className={styles.welcomeBanner}>
+          <div className={styles.shimmerStripe} aria-hidden="true" />
           <h1>
             Good day, <span>{firstName}</span>
           </h1>

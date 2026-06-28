@@ -34,7 +34,7 @@ const Hero = () => {
 
           <div className={styles.actions}>
             <Link to="/login" className={styles.btnPrimary}>
-              Log In to Portal
+              <span>Log In to Portal</span>
             </Link>
             <Link to="/register" className={styles.btnSecondary}>
               Create Account →

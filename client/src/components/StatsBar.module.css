@@ -1,12 +1,40 @@
 /* ─────────────────────────────────────────────────────────────────
-   STATSBAR — CSS MODULE
+   STATSBAR — CSS MODULE (Premium Upgrade with Count-Up + Hover)
    ───────────────────────────────────────────────────────────────── */
 
 .statsBar {
-  background: var(--midnight);
+  position  : relative;
+  background: var(--midnight-3);
+  overflow  : hidden;
+}
+
+/* Gold glow top border */
+.statsBar::before {
+  content   : '';
+  position  : absolute;
+  top       : 0;
+  left      : 10%;
+  right     : 10%;
+  height    : 2px;
+  background: var(--gradient-gold);
+  border-radius: 0 0 4px 4px;
+  opacity   : 0.8;
+  box-shadow: 0 0 20px rgba(196, 149, 42, 0.5);
+}
+
+/* Subtle gradient overlay */
+.statsBar::after {
+  content   : '';
+  position  : absolute;
+  inset     : 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 50% 120%, rgba(196, 149, 42, 0.06) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .inner {
+  position: relative;
+  z-index  : 1;
   max-width: 1200px;
   margin   : 0 auto;
   padding  : 0 24px;
@@ -14,46 +42,102 @@
   grid-template-columns: repeat(4, 1fr);
 }
 
+/* ── Stat Item ── */
 .statItem {
-  display       : flex;
-  flex-direction: column;
-  align-items   : center;
-  padding       : 44px 24px;
-  border-right  : 1px solid rgba(255, 255, 255, 0.07);
-  gap           : 6px;
-  text-align    : center;
+  display        : flex;
+  flex-direction : column;
+  align-items    : center;
+  padding        : 48px 24px;
+  border-right   : 1px solid rgba(255, 255, 255, 0.06);
+  gap            : 8px;
+  text-align     : center;
+  cursor         : default;
+  position       : relative;
+  transition     : background 0.3s ease, transform 0.3s var(--ease-bounce);
+  opacity        : 0;
+  transform      : translateY(16px);
+}
+
+.statItem.visible {
+  animation: countUp 0.6s var(--ease-out) both;
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+.statItem::before {
+  content  : '';
+  position : absolute;
+  inset    : 0;
+  background: rgba(196, 149, 42, 0.0);
+  transition: background 0.3s ease;
+}
+
+.statItem:hover::before {
+  background: rgba(196, 149, 42, 0.05);
+}
+
+.statItem:hover {
+  transform: translateY(-3px);
 }
 
 .statItem:last-child {
   border-right: none;
 }
 
+.icon {
+  font-size      : 22px;
+  width          : 44px;
+  height         : 44px;
+  background     : rgba(196, 149, 42, 0.1);
+  border         : 1px solid rgba(196, 149, 42, 0.2);
+  border-radius  : var(--radius-md);
+  display        : flex;
+  align-items    : center;
+  justify-content: center;
+  margin-bottom  : 4px;
+  transition     : transform 0.3s var(--ease-bounce),
+                   box-shadow 0.3s ease;
+}
+
+.statItem:hover .icon {
+  transform : scale(1.1) rotate(-5deg);
+  box-shadow: 0 4px 16px rgba(196, 149, 42, 0.3);
+}
+
 .value {
-  font-family  : var(--font-display);
-  font-size    : 38px;
-  font-weight  : 700;
-  color        : var(--gold);
-  letter-spacing: -1px;
-  line-height  : 1;
+  font-family   : var(--font-display);
+  font-size     : 40px;
+  font-weight   : 700;
+  background    : var(--gradient-gold);
+  background-size: 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation     : shimmer 4s linear infinite;
+  letter-spacing: -1.5px;
+  line-height   : 1;
 }
 
 .label {
-  font-family  : var(--font-body);
-  font-size    : 12px;
-  font-weight  : 500;
-  color        : rgba(255, 255, 255, 0.45);
-  letter-spacing: 0.5px;
+  font-family   : var(--font-body);
+  font-size     : 11px;
+  font-weight   : 500;
+  color         : rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.8px;
   text-transform: uppercase;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .inner {
     grid-template-columns: repeat(2, 1fr);
   }
 
   .statItem:nth-child(1),
   .statItem:nth-child(2) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .statItem:nth-child(2),
@@ -61,5 +145,11 @@
     border-right: none;
   }
 
-  .value { font-size: 32px; }
+  .value { font-size: 34px; }
+  .statItem { padding: 36px 16px; }
+}
+
+@media (max-width: 400px) {
+  .value { font-size: 28px; }
+  .icon  { font-size: 18px; width: 36px; height: 36px; }
 }

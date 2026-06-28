@@ -1,37 +1,73 @@
 /* ─────────────────────────────────────────────────────────────────
    GOOGLE FONTS
    Playfair Display → display headlines (academic, authoritative)
-   Inter            → all UI text (clean, readable at small sizes)
-   Both loaded from Google Fonts CDN — no npm install needed.
+   Plus Jakarta Sans → modern UI font (replaces Inter for premium feel)
+   Inter            → fallback UI text
    ───────────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
 
 /* ─────────────────────────────────────────────────────────────────
    DESIGN TOKENS
-   All colours and fonts live here as CSS custom properties.
-   Change a value once → it updates everywhere that uses the token.
-   This is the CSS equivalent of a constants file in JavaScript.
    ───────────────────────────────────────────────────────────────── */
 :root {
-  /* Palette */
-  --midnight  : #0D1B3E;   /* navbar, dark buttons, headings       */
-  --gold      : #C4952A;   /* signature accent — used sparingly    */
-  --gold-dark : #A07820;   /* gold on hover states                 */
-  --ivory     : #F5F3EE;   /* hero section background              */
+  /* Core Palette */
+  --midnight  : #0D1B3E;
+  --midnight-2: #1a2d5a;
+  --midnight-3: #0a1328;
+  --gold      : #C4952A;
+  --gold-dark : #A07820;
+  --gold-light: #F5EDD6;
+  --gold-glow : rgba(196, 149, 42, 0.35);
+  --ivory     : #F5F3EE;
+  --ivory-2   : #EFECE5;
   --white     : #FFFFFF;
-  --slate     : #64748B;   /* secondary / body text                */
-  --ink       : #1A1A2E;   /* primary body text                    */
-  --border    : #E2DDD5;   /* dividers and card borders            */
+  --slate     : #64748B;
+  --slate-2   : #94A3B8;
+  --ink       : #1A1A2E;
+  --border    : #E2DDD5;
+  --border-2  : #D4D0C8;
+
+  /* Semantic */
+  --success   : #22C55E;
+  --error     : #EF4444;
+  --info      : #3B82F6;
+
+  /* Gradients */
+  --gradient-brand   : linear-gradient(135deg, var(--midnight) 0%, var(--midnight-2) 100%);
+  --gradient-gold    : linear-gradient(135deg, #C4952A 0%, #E8B84B 50%, #C4952A 100%);
+  --gradient-hero    : linear-gradient(135deg, #F5F3EE 0%, #EDE9E0 40%, #F0ECE3 100%);
+  --gradient-glass   : linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+
+  /* Shadows */
+  --shadow-sm  : 0 2px 8px rgba(13, 27, 62, 0.08);
+  --shadow-md  : 0 4px 20px rgba(13, 27, 62, 0.12);
+  --shadow-lg  : 0 8px 40px rgba(13, 27, 62, 0.18);
+  --shadow-xl  : 0 20px 60px rgba(13, 27, 62, 0.24);
+  --shadow-gold: 0 8px 32px rgba(196, 149, 42, 0.35);
+
+  /* Blur / Glass */
+  --blur-sm : blur(8px);
+  --blur-md : blur(16px);
+  --blur-lg : blur(24px);
+
+  /* Radius */
+  --radius-sm : 6px;
+  --radius-md : 10px;
+  --radius-lg : 16px;
+  --radius-xl : 24px;
 
   /* Type */
   --font-display : 'Playfair Display', Georgia, serif;
-  --font-body    : 'Inter', system-ui, -apple-system, sans-serif;
+  --font-body    : 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Transitions */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out   : cubic-bezier(0, 0, 0.2, 1);
 }
 
 /* ─────────────────────────────────────────────────────────────────
    RESET
-   Removes browser default margins and switches to border-box so
-   padding doesn't unexpectedly expand element widths.
    ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing : border-box;
@@ -40,37 +76,119 @@
 }
 
 body {
-  font-family              : var(--font-body);
-  color                    : var(--ink);
-  background               : var(--white);
-  line-height              : 1.6;
-  -webkit-font-smoothing   : antialiased;
-  -moz-osx-font-smoothing  : grayscale;
+  font-family             : var(--font-body);
+  color                   : var(--ink);
+  background              : var(--white);
+  line-height             : 1.6;
+  -webkit-font-smoothing  : antialiased;
+  -moz-osx-font-smoothing : grayscale;
 }
 
-/* Smooth scrolling when anchor links fire */
 html {
   scroll-behavior: smooth;
 }
 
-/* Remove default link underlines — each component styles its own */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Remove default list bullets */
 ul, ol {
   list-style: none;
 }
 
-/* Respect user's reduced-motion preference.
-   Disables all CSS transitions for users who find animation
-   uncomfortable — an accessibility requirement. */
+/* ─────────────────────────────────────────────────────────────────
+   GLOBAL KEYFRAMES
+   ───────────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to   { opacity: 1; transform: translateX(0);     }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1);    }
+  50%       { opacity: 0.6; transform: scale(1.4); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px);   }
+  50%       { transform: translateY(-8px);  }
+}
+
+@keyframes floatReverse {
+  0%, 100% { transform: translateY(-6px); }
+  50%       { transform: translateY(4px);  }
+}
+
+@keyframes orbit {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes orbitReverse {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to   { transform: translate(-50%, -50%) rotate(0deg);   }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200%  center; }
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px);  }
+  to   { opacity: 1; transform: translateY(0);     }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0%   50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0%   50%; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   UTILITY ANIMATION CLASSES
+   ───────────────────────────────────────────────────────────────── */
+.anim-fade-up {
+  animation: fadeInUp 0.6s var(--ease-out) both;
+}
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.2s; }
+.anim-delay-3 { animation-delay: 0.3s; }
+.anim-delay-4 { animation-delay: 0.4s; }
+.anim-delay-5 { animation-delay: 0.5s; }
+
+/* ─────────────────────────────────────────────────────────────────
+   ACCESSIBILITY
+   ───────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration     : 0.01ms !important;
-    animation-iteration-count : 1   !important;
-    transition-duration    : 0.01ms !important;
+    animation-duration        : 0.01ms !important;
+    animation-iteration-count : 1      !important;
+    transition-duration       : 0.01ms !important;
   }
 }
