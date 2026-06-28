@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import styles from './Dashboard.module.css';
+import Sidebar from '../components/Sidebar';
+import AdminDashboard from '../components/dashboard/AdminDashboard';
+import FacultyDashboard from '../components/dashboard/FacultyDashboard';
+import StudentDashboard from '../components/dashboard/StudentDashboard';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,7 +28,7 @@ const Dashboard = () => {
           setUser(res.data.data);
           localStorage.setItem('user', JSON.stringify(res.data.data));
         }
-      } catch (err) {
+      } catch {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/login');
@@ -68,6 +72,20 @@ const Dashboard = () => {
     month: 'long',
   });
 
+  const renderRoleDashboard = () => {
+    const normalizedRole = user?.role?.toLowerCase();
+    switch (normalizedRole) {
+      case 'admin':
+        return <AdminDashboard user={user} />;
+      case 'faculty':
+        return <FacultyDashboard user={user} />;
+      case 'student':
+        return <StudentDashboard user={user} />;
+      default:
+        return <StudentDashboard user={user} />;
+    }
+  };
+
   return (
     <div className={styles.dashboardLayout}>
       {/* NAVBAR */}
@@ -87,53 +105,8 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      {/* SIDEBAR */}
-      <aside className={styles.sidebar}>
-        <div className={styles.sidebarUser}>
-          <div className={styles.suName}>{user?.fullName || 'User'}</div>
-          <div className={styles.suDept}>{deptDisplay}</div>
-          <span className={styles.suBadge}>{roleDisplay}</span>
-        </div>
-
-        <div className={styles.sidebarSection}>
-          <div className={styles.sidebarLabel}>Main</div>
-          <button className={`${styles.navItem} ${styles.active}`}>
-            <i className="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
-          </button>
-          <button className={styles.navItem}>
-            <i className="ti ti-calendar" aria-hidden="true"></i> Schedule
-          </button>
-          <button className={styles.navItem}>
-            <i className="ti ti-book" aria-hidden="true"></i> Courses
-          </button>
-          <button className={styles.navItem}>
-            <i className="ti ti-chart-bar" aria-hidden="true"></i> Grades
-          </button>
-        </div>
-
-        <div className={styles.sidebarDivider}></div>
-
-        <div className={styles.sidebarSection}>
-          <div className={styles.sidebarLabel}>Account</div>
-          <button className={styles.navItem}>
-            <i className="ti ti-user" aria-hidden="true"></i> Profile
-          </button>
-          <button className={styles.navItem}>
-            <i className="ti ti-settings" aria-hidden="true"></i> Settings
-          </button>
-          <button className={styles.navItem}>
-            <i className="ti ti-bell" aria-hidden="true"></i> Notifications
-          </button>
-        </div>
-
-        <div className={styles.sidebarDivider}></div>
-
-        <div className={styles.sidebarSection}>
-          <button className={styles.navItem} onClick={handleLogout} style={{ color: '#c0392b' }}>
-            <i className="ti ti-logout" aria-hidden="true"></i> Logout
-          </button>
-        </div>
-      </aside>
+      {/* DYNAMIC ROLE SIDEBAR */}
+      <Sidebar user={user} onLogout={handleLogout} />
 
       {/* MAIN CONTENT */}
       <main className={styles.main}>
@@ -163,120 +136,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* STATS */}
-        <div className={styles.statsGrid}>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>
-              <i className="ti ti-book" aria-hidden="true"></i> Courses
-            </div>
-            <div className={styles.statVal}>6</div>
-            <div className={styles.statSub}>This semester</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>
-              <i className="ti ti-clipboard-check" aria-hidden="true"></i> Assignments
-            </div>
-            <div className={styles.statVal}>3</div>
-            <div className={styles.statSub}>Due this week</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>
-              <i className="ti ti-chart-line" aria-hidden="true"></i> GPA
-            </div>
-            <div className={styles.statVal}>3.8</div>
-            <div className={styles.statSub}>Current standing</div>
-          </div>
-          <div className={styles.statCard}>
-            <div className={styles.statLabel}>
-              <i className="ti ti-users" aria-hidden="true"></i> Credits
-            </div>
-            <div className={styles.statVal}>18</div>
-            <div className={styles.statSub}>Enrolled this term</div>
-          </div>
-        </div>
-
-        {/* CONTENT PANELS */}
-        <div className={styles.contentGrid}>
-          <div className={styles.panel}>
-            <div className={styles.panelTitle}>
-              <i className="ti ti-clock" aria-hidden="true"></i> Recent activity
-            </div>
-            <div className={styles.activityItem}>
-              <div className={styles.activityDot}></div>
-              <div>
-                <div className={styles.activityText}>Assignment submitted — Data Structures</div>
-                <div className={styles.activityTime}>2 hours ago</div>
-              </div>
-            </div>
-            <div className={styles.activityItem}>
-              <div className={styles.activityDot}></div>
-              <div>
-                <div className={styles.activityText}>Grade posted — Calculus II: A−</div>
-                <div className={styles.activityTime}>Yesterday</div>
-              </div>
-            </div>
-            <div className={styles.activityItem}>
-              <div className={styles.activityDot}></div>
-              <div>
-                <div className={styles.activityText}>New announcement in Operating Systems</div>
-                <div className={styles.activityTime}>2 days ago</div>
-              </div>
-            </div>
-            <div className={styles.activityItem}>
-              <div className={styles.activityDot}></div>
-              <div>
-                <div className={styles.activityText}>Enrolled in Advanced Algorithms</div>
-                <div className={styles.activityTime}>3 days ago</div>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.panel}>
-            <div className={styles.panelTitle}>
-              <i className="ti ti-book-2" aria-hidden="true"></i> My courses
-            </div>
-            <div className={styles.courseItem}>
-              <div className={styles.courseIcon}>
-                <i className="ti ti-code" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div className={styles.courseName}>Data Structures</div>
-                <div className={styles.courseCode}>CS301</div>
-              </div>
-              <span className={`${styles.courseBadge} ${styles.badgeGreen}`}>Active</span>
-            </div>
-            <div className={styles.courseItem}>
-              <div className={styles.courseIcon}>
-                <i className="ti ti-math" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div className={styles.courseName}>Calculus II</div>
-                <div className={styles.courseCode}>MA201</div>
-              </div>
-              <span className={`${styles.courseBadge} ${styles.badgeGreen}`}>Active</span>
-            </div>
-            <div className={styles.courseItem}>
-              <div className={styles.courseIcon}>
-                <i className="ti ti-cpu" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div className={styles.courseName}>Operating Systems</div>
-                <div className={styles.courseCode}>CS410</div>
-              </div>
-              <span className={`${styles.courseBadge} ${styles.badgeGold}`}>Pending</span>
-            </div>
-            <div className={styles.courseItem}>
-              <div className={styles.courseIcon}>
-                <i className="ti ti-network" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div className={styles.courseName}>Advanced Algorithms</div>
-                <div className={styles.courseCode}>CS501</div>
-              </div>
-              <span className={`${styles.courseBadge} ${styles.badgeGreen}`}>Active</span>
-            </div>
-          </div>
-        </div>
+        {/* DYNAMIC ROLE-BASED DASHBOARD RENDERING */}
+        {renderRoleDashboard()}
       </main>
     </div>
   );
